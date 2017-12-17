@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+<head>
+    <!--
+    Customize this policy to fit your own app's needs. For more guidance, see:
+        https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+    Some notes:
+        * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+        * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+        * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+            * Enable inline JS: add 'unsafe-inline' to default-src
+    -->
+    <!--<meta http-equiv="Content-Security-Policy"-->
+    <!--content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">-->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta charset="UTF-8">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *;connect-src *;script-src 'self' 'unsafe-inline';">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <link rel="stylesheet" type="text/css" href="css/jquery-1.5.0.mobile.min.css">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <title>Demo</title>
+</head>
+<body>
+<div data-role="page">
+    <h1>Supplier Price Offer </h1>
+    <div role="main" class="ui-content">
+        <label for="supplier">Supplier</label>
+        <input type="text" id="supplier" readonly="readonly" value="abc">
+
+        <label for="price">Price</label>
+        <input type="text" id="price" value="100.0">
+
+        <button class="ui-btn" id="btnSubmit">POST</button>
+
+        <!--<p class="event listening">Connecting to Device</p>-->
+        <!--<p class="event received">Device is Ready</p>-->
+    </div>
+    <div data-role="footer" data-position="fixed" data-theme="b" data-id="pageFooter">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#" data-transition="slide" data-icon="star" class="ui-btn-active ui-state-persist">&#x62A5;&#x4EF7;</a></li>
+                <li><a href="#" data-transition="slide" data-icon="grid">&#x884C;&#x7A0B;&#x8BB0;&#x5F55;</a></li>
+                <li><a href="#" data-transition="slide" data-icon="grid">&#x5386;&#x53F2;&#x8BB0;&#x5F55;</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!--<div class="app">-->
+<!--<h1>Apache Cordova</h1>-->
+<!--<div id="deviceready" class="blink">-->
+<!--<p class="event listening">Connecting to Device</p>-->
+<!--<p class="event received">Device is Ready</p>-->
+<!--</div>-->
+<!--</div>-->
+<script type="text/javascript" src="cordova.js"></script>
+
+<script type="text/javascript" src="js/jquery-1.11.1.min.js" id="cordova-jquery"></script>
+<script type="text/javascript" id="jqm-trans-disable">
+    /* For having a faster transition */
+    var server_url = "http://localhost:8080/api/offer";
+
+    $(document).on("mobileinit", function () {
+        console.debug("mobileInit");
+        $.mobile.defaultPageTransition = "none";
+        $.mobile.defaultDialogTransition = "none";
+        $.support.cors = true;
+        $.mobile.allowCrossDomainPages = true;
+    });
+
+
+    function submitOffer() {
+        var priceDate = {
+            supplier: $('#supplier').val(),
+            price: $('#price').val()
+        };
+        // alert("priceDate=" + JSON.stringify(priceDate));
+        try {
+            $.ajax({
+                url: server_url,
+                type: "POST",
+                crossDomain: true,
+                data: JSON.stringify(priceDate) ,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                accept: "application/json",
+                statusCode: {
+                    401: function () {
+                        alert("401");
+                    },
+                    404: function () {
+                        alert("404");
+                    },
+                    200: function () {
+                        alert("200");
+                    },
+                    201: function () {
+                        alert("201");
+                    },
+                    202: function () {
+                        alert("202");
+                    },
+                    405: function () {
+                        alert("405")
+                    }
+                },
+                success: function (XMLHttpRequest, textStatus) {
+                    alert( XMLHttpRequest.result);
+                    // alert("textStatus=" + textStatus);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("XMLHttpRequest=" + XMLHttpRequest.status);
+                    // alert("XMLHttpRequest=" + XMLHttpRequest.readyState);
+                    // alert("textStatus=" + textStatus);
+                },
+                async: false
+            });
+        } catch (e) {
+            alert(e.name + " : " + e.message);
+        }
+    }
+
+
+    $('#btnSubmit').click(submitOffer);
+</script>
+<script type="text/javascript" src="js/jquery-1.5.0.mobile.min.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+</body>
+</html>
